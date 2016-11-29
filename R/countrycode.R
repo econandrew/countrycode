@@ -15,6 +15,11 @@
 #' checks are conducted. The data frame format must resemble
 #' countrycode::countrycode_data. Custom dictionaries only work with strings
 #' (no regexes).
+#' @param extra A data frame which supplies additional country codes in the scheme
+#' chosen by origin/destination, to supplement the official list. Must be a two-
+#' column data frame in which the first column relates to origin and the second to
+#' destination (column names are ignored). Warnings will be suppressed if a match
+#' is returned from this data frame. Regexes not supported.
 #' @keywords countrycode
 #' @note Supports the following coding schemes: Correlates of War character,
 #'   CoW-numeric, ISO3-character, ISO3-numeric, ISO2-character, IMF numeric, International
@@ -31,6 +36,7 @@
 #' @examples
 #' codes.of.origin <- countrycode::countrycode_data$cowc # Vector of values to be converted
 #' countrycode(codes.of.origin, "cowc", "iso3c")
+#' TODO: extra example
 countrycode <- function (sourcevar, origin, destination, warn=FALSE, dictionary=NULL){
     # Sanity check
     if(is.null(dictionary)){ # no sanity check if custom dictionary
@@ -64,6 +70,9 @@ countrycode <- function (sourcevar, origin, destination, warn=FALSE, dictionary=
         destination_list <- destination_list[lapply(destination_list, length) > 2]
     }else{ # non-regex codes
         dict = na.omit(dictionary[, c(origin, destination)])
+        if (!is.null(extra)) {
+          dict <- rbind(dict, extra)
+        }
         matches <- match(sourcevar, dict[, origin])
         destination_vector <- dict[matches, destination]
     }
