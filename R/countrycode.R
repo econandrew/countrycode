@@ -17,9 +17,9 @@
 #' (no regexes).
 #' @param extra A data frame which supplies additional country codes in the scheme
 #' chosen by origin/destination, to supplement the official list. Must be a two-
-#' column data frame in which the first column relates to origin and the second to
-#' destination (column names are ignored). Warnings will be suppressed if a match
-#' is returned from this data frame. Regexes not supported.
+#' column data frame or a list of two vectors. Column names must match if used. 
+#' Warnings will be suppressed if a match is returned from this data frame.
+#' Regexes not supported.
 #' @keywords countrycode
 #' @note Supports the following coding schemes: Correlates of War character,
 #'   CoW-numeric, ISO3-character, ISO3-numeric, ISO2-character, IMF numeric, International
@@ -36,8 +36,12 @@
 #' @examples
 #' codes.of.origin <- countrycode::countrycode_data$cowc # Vector of values to be converted
 #' countrycode(codes.of.origin, "cowc", "iso3c")
-#' TODO: extra example
-countrycode <- function (sourcevar, origin, destination, warn=FALSE, dictionary=NULL){
+#'
+#' two_letter <- c("AU", "US", "XK") # World Bank uses user-assigned XK for Kosovo
+#' countrycode(two_letter, "iso2c", "country.name", warn=TRUE)
+#' countrycode(two_letter, "iso2c", "country.name", warn=TRUE,
+#'             extra=list(c("XK", "JG"),c("Kosovo", "Channel Islands")))
+countrycode <- function (sourcevar, origin, destination, warn=FALSE, dictionary=NULL, extra=NULL){
     # Sanity check
     if(is.null(dictionary)){ # no sanity check if custom dictionary
         if(is.null(sourcevar)){ 
@@ -70,6 +74,12 @@ countrycode <- function (sourcevar, origin, destination, warn=FALSE, dictionary=
         destination_list <- destination_list[lapply(destination_list, length) > 2]
     }else{ # non-regex codes
         dict = na.omit(dictionary[, c(origin, destination)])
+        
+        # If origin, destination same, we are effectively just validating
+        # but we still want to use both columns, one of which will have .1 appended
+        if (origin == destination) {
+          destination = paste0(destination,".1")
+        }
         if (!is.null(extra)) {
           dict <- rbind(dict, extra)
         }

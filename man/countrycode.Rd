@@ -4,7 +4,8 @@
 \alias{countrycode}
 \title{Convert Country Codes}
 \usage{
-countrycode(sourcevar, origin, destination, warn = FALSE, dictionary = NULL)
+countrycode(sourcevar, origin, destination, warn = FALSE, dictionary = NULL,
+  extra = NULL)
 }
 \arguments{
 \item{sourcevar}{Vector which contains the codes or country names to be converted}
@@ -21,6 +22,12 @@ countries.  When countrycode uses a user-supplied dictionary, no sanity
 checks are conducted. The data frame format must resemble
 countrycode::countrycode_data. Custom dictionaries only work with strings
 (no regexes).}
+
+\item{extra}{A data frame which supplies additional country codes in the scheme
+chosen by origin/destination, to supplement the official list. Must be a two-
+column data frame or a list of two vectors. Column names must match if used. 
+Warnings will be suppressed if a match is returned from this data frame.
+Regexes not supported.}
 }
 \description{
 Converts long country names into one of many different coding schemes.
@@ -43,6 +50,11 @@ Supports the following coding schemes: Correlates of War character,
 \examples{
 codes.of.origin <- countrycode::countrycode_data$cowc # Vector of values to be converted
 countrycode(codes.of.origin, "cowc", "iso3c")
+
+two_letter <- c("AU", "US", "XK") # World Bank uses user-assigned XK for Kosovo
+countrycode(two_letter, "iso2c", "country.name", warn=TRUE)
+countrycode(two_letter, "iso2c", "country.name", warn=TRUE,
+            extra=list(c("XK", "JG"),c("Kosovo", "Channel Islands")))
 }
 \keyword{countrycode}
 

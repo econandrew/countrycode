@@ -52,3 +52,11 @@ for(code_name in code_dups){
         expect_that(dupes, equals(''))
     })
 }
+
+test_that('extra dictionary correctly maps and does not warn', {
+  extra_code = list(c("XK", "JG"), c("KSV", "CHI"))
+  iso2c_extra_of <- function(iso2c_code) countrycode(iso2c_code, 'iso2c', 'iso3c', warn=TRUE, extra=extra_code)
+  
+  expect_that(iso2c_extra_of(c('AU', 'XK')), equals(c('AUS', 'KSV')))
+  expect_that(iso2c_extra_of(c('JG')), equals('CHI'))
+})
